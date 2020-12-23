@@ -9,7 +9,7 @@ install.packages("readxl")
 install.packages("tidyr")
 install.packages("data.table")
 install.packages("R6")
-install.packages("checkamte")
+install.packages("checkmate")
 install.packages("Rcpp")
 
 

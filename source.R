@@ -74,7 +74,7 @@ translate.DE <- function(data) {
   Daten <- data
   #Bayern
   names(Daten$bavaria$lgl$bavaria_lgl_overview) <- c("Region", "Fälle", "Todesfälle")
-  names(Daten$bavaria$lgl$bavaria_lgl_change) <- c("Spalte", "Gesamtfallzahl", "Differenz.zum.letzten.Aktualisierungs.Zeitpunkt", "Neu.berichtete.aktuelle.Fälle.seit.letzter.Aktualisierung", "Nachmeldungen", "Löschungen", "Ohne Sterbedatum")
+  names(Daten$bavaria$lgl$bavaria_lgl_change) <- c("Spalte", "Gesamtfallzahl", "Differenz.zum.letzten.Aktualisierungs.Zeitpunkt", "Neu.berichtete.aktuelle.Fälle.seit.letzter.Aktualisierung", "Nachmeldungen", "Löschungen")
   names(Daten$bavaria$lgl$bavaria_lgl_regions) <- c("Regierungsbezirk", "Anzahl.der.Fälle", "Fälle.Änderung.zum.Vortag", "Fallzahl.pro.100.000.Einwohner", "Fälle.der.letzten.7.Tage", "X7.Tage.Inzidenz.pro.100.000.Einwohner", "Anzahl.der.Todesfälle", "Todesfälle.Änderung.zum.Vortag")
   names(Daten$bavaria$lgl$bavaria_lgl_county) <- c("Landkreis.Stadt", "Anzahl.der.Fälle", "Fälle.Änderung.zum.Vortag", "Fallzahl.pro.100.000.Einwohner", "Fälle.der.letzten.7.Tage", "X7.Tage.Inzidenz.pro.100.000.Einwohner", "Anzahl.der.Todesfälle", "Todesfälle.Änderung.zum.Vortag")
   names(Daten$bavaria$lgl$bavaria_lgl_days) <- c("Datum", "Vortag.bekannt", "Heute.bekannt", "bay.Fälle")
@@ -105,7 +105,7 @@ translate.DE <- function(data) {
   names(Daten$czech$czech_10) <- c("Datum","Alter","Geschlecht","Bundesland","Landkreis")
   names(Daten$czech$czech_11) <- c("Wochentag","Postleitzahl","PLZName","Inzidenz_7","Inzidenz_65_7","Häufigkeit","Häufigkeit_65","Häufigkeit_75","Aktuelle_Krankenhauspatient","Neuezahl_Krankenhauspatient_7","Testzahl_7")
   names(Daten$czech$czech_12) <- c("Datum","GesamtTest","Insgesamtfälle","Aktuellefälle","AnzahlGenesen","Todesfälle","Aktuelle_KrankenhausPatient","AnzhalTest_Gestern","Anzahlfälle_Gestern","Anzahlfälle_Heute","GesternDatum","Insgesamtfallzahl_Datum_Gestern","Insgesamtfallzahl_Datum_Heute")
- 
+  
   #Schweden
   names(Daten$sweden$sweden_1) <- c("Datum", "swe.Fälle", "Blekinge", "Dalarna", "Gotland", "Gävleborg", "Halland", "Jämtland_Härjedalen", "Jönköping",
                                     "Kalmar", "Kronoberg", "Norrbotten", "Skåne", "Stockholm", "Sörmland", "Uppsala", "Värmland", "Västerbotten", "Västernorrland",
@@ -115,8 +115,8 @@ translate.DE <- function(data) {
   names(Daten$sweden$sweden_4) <- c("Landkreis", "Fälle", "Fallzahl.pro.100.000.Einwohner", "Anzahl.Fälle.IC", "Todesfälle")
   names(Daten$sweden$sweden_5) <- c("Geschlecht", "Fälle", "Anzahl.Fälle.ICU", "Todesfälle")
   names(Daten$sweden$sweden_6) <- c("Altersgruppe", "Fälle", "Anzahl.der.Fälle.IC", "Todesfälle")
-  names(Daten$sweden$sweden_7) <- c("Wochen.Nr", "Landkreis", "Anzahl.der.Fälle.der.Woche", "Gesamtzahl.der.Fälle", "Anzahl.Fälle.IC.der.Woche", "Gesamtzahl.der.Fälle.IC", "Todesfälle.der.Woche", "Gesamtzahl.der.Todesfälle", "Fallzahl.pro.100.000.Einwohner.der.Woche", "Gesamte.Fallzahl.pro.100.000.Einwohner")
-  names(Daten$sweden$sweden_8) <- c("Wochen.Nr", "Kn.Code", "Kn.Name", "Kreis", "Gemeindebezirk", "Gesamtzahl.der.Fälle.pro.10000.Einwohner", "Anzahl.der.Fälle.pro.10000.Einwohner", "Gesamtzahl.der.Fälle", "neue.Fälle.der.Woche")
+  names(Daten$sweden$sweden_7) <- c("Jahr", "Wochen.Nr", "Landkreis", "Anzahl.der.Fälle.der.Woche", "Gesamtzahl.der.Fälle", "Anzahl.Fälle.IC.der.Woche", "Gesamtzahl.der.Fälle.IC", "Todesfälle.der.Woche", "Gesamtzahl.der.Todesfälle", "Fallzahl.pro.100.000.Einwohner.der.Woche", "Gesamte.Fallzahl.pro.100.000.Einwohner")
+  names(Daten$sweden$sweden_8) <- c("Jahr", "Wochen.Nr", "Kn.Code", "Kn.Name", "Kreis", "Gemeindebezirk", "Gesamtzahl.der.Fälle.pro.10000.Einwohner", "Anzahl.der.Fälle.pro.10000.Einwohner", "Gesamtzahl.der.Fälle", "neue.Fälle.der.Woche")
   
   
   
