@@ -1,16 +1,16 @@
-#17.11.2020
+#22.12.20
 update.data <- function() { 
   #BAVARIA
   
-  bavaria_lgl_overview  <- as.data.table(read.csv("data/bavaria/lgl/tabelle_01_20201117.csv", skip = 1, sep = ";", encoding="UTF-8"))
-  bavaria_lgl_change    <- as.data.table(read.csv("data/bavaria/lgl/tabelle_02_20201117.csv", skip = 1, sep = ";", encoding="UTF-8"))
-  bavaria_lgl_regions   <- as.data.table(read.csv("data/bavaria/lgl/tabelle_03_20201117.csv", skip = 1, sep = ";", encoding="UTF-8"))
-  bavaria_lgl_countys   <- as.data.table(read.csv("data/bavaria/lgl/tabelle_04_20201117.csv", skip = 1, sep = ";", encoding="UTF-8"))
-  bavaria_lgl_days      <- as.data.table(read.csv("data/bavaria/lgl/tabelle_05_20201117.csv", skip = 1, sep = ";", encoding="UTF-8", dec = "."))
-  bavaria_lgl_weeks1    <- as.data.table(read.csv("data/bavaria/lgl/tabelle_06_20201117.csv", skip = 1, sep = ";", encoding="UTF-8"))
-  bavaria_lgl_age       <- as.data.table(read.csv("data/bavaria/lgl/tabelle_07_20201117.csv", skip = 1, sep = ";", encoding="UTF-8"))
-  bavaria_lgl_weeks2    <- as.data.table(read.csv("data/bavaria/lgl/tabelle_08_20201117.csv", skip = 1, sep = ";", encoding="UTF-8"))
-  bavaria_lgl_tests     <- as.data.table(read.csv("data/bavaria/lgl/tabelle_09_20201117.csv", skip = 1, sep = ";", encoding="UTF-8"))
+  bavaria_lgl_overview  <- as.data.table(read.csv("data/bavaria/lgl/tabelle_01_20201221.csv", skip = 1, sep = ";", encoding="UTF-8"))
+  bavaria_lgl_change    <- as.data.table(read.csv("data/bavaria/lgl/tabelle_02_20201221.csv", skip = 1, sep = ";", encoding="UTF-8"))
+  bavaria_lgl_regions   <- as.data.table(read.csv("data/bavaria/lgl/tabelle_03_20201221.csv", skip = 1, sep = ";", encoding="UTF-8"))
+  bavaria_lgl_countys   <- as.data.table(read.csv("data/bavaria/lgl/tabelle_04_20201221.csv", skip = 1, sep = ";", encoding="UTF-8"))
+  bavaria_lgl_days      <- as.data.table(read.csv("data/bavaria/lgl/tabelle_05_20201221.csv", skip = 1, sep = ";", encoding="UTF-8", dec = "."))
+  bavaria_lgl_weeks1    <- as.data.table(read.csv("data/bavaria/lgl/tabelle_06_20201221.csv", skip = 1, sep = ";", encoding="UTF-8"))
+  bavaria_lgl_age       <- as.data.table(read.csv("data/bavaria/lgl/tabelle_07_20201221.csv", skip = 1, sep = ";", encoding="UTF-8"))
+  bavaria_lgl_weeks2    <- as.data.table(read.csv("data/bavaria/lgl/tabelle_08_20201221.csv", skip = 1, sep = ";", encoding="UTF-8"))
+  bavaria_lgl_tests     <- as.data.table(read.csv("data/bavaria/lgl/tabelle_09_20201221.csv", skip = 1, sep = ";", encoding="UTF-8"))
   
   lgl <- list(bavaria_lgl_overview, bavaria_lgl_change, bavaria_lgl_regions, bavaria_lgl_countys, bavaria_lgl_days,
               bavaria_lgl_weeks1, bavaria_lgl_age, bavaria_lgl_weeks2, bavaria_lgl_tests)
@@ -74,7 +74,7 @@ translate.DE <- function(data) {
   Daten <- data
   #Bayern
   names(Daten$bavaria$lgl$bavaria_lgl_overview) <- c("Region", "Fälle", "Todesfälle")
-  names(Daten$bavaria$lgl$bavaria_lgl_change) <- c("Spalte", "Gesamtfallzahl", "Differenz.zum.letzten.Aktualisierungs.Zeitpunkt", "Neu.berichtete.aktuelle.Fälle.seit.letzter.Aktualisierung", "Nachmeldungen", "Löschungen")
+  names(Daten$bavaria$lgl$bavaria_lgl_change) <- c("Spalte", "Gesamtfallzahl", "Differenz.zum.letzten.Aktualisierungs.Zeitpunkt", "Neu.berichtete.aktuelle.Fälle.seit.letzter.Aktualisierung", "Nachmeldungen", "Löschungen", "Ohne Sterbedatum")
   names(Daten$bavaria$lgl$bavaria_lgl_regions) <- c("Regierungsbezirk", "Anzahl.der.Fälle", "Fälle.Änderung.zum.Vortag", "Fallzahl.pro.100.000.Einwohner", "Fälle.der.letzten.7.Tage", "X7.Tage.Inzidenz.pro.100.000.Einwohner", "Anzahl.der.Todesfälle", "Todesfälle.Änderung.zum.Vortag")
   names(Daten$bavaria$lgl$bavaria_lgl_county) <- c("Landkreis.Stadt", "Anzahl.der.Fälle", "Fälle.Änderung.zum.Vortag", "Fallzahl.pro.100.000.Einwohner", "Fälle.der.letzten.7.Tage", "X7.Tage.Inzidenz.pro.100.000.Einwohner", "Anzahl.der.Todesfälle", "Todesfälle.Änderung.zum.Vortag")
   names(Daten$bavaria$lgl$bavaria_lgl_days) <- c("Datum", "Vortag.bekannt", "Heute.bekannt", "bay.Fälle")
@@ -183,4 +183,47 @@ daily.incedence <- function(Daten, end = Sys.Date(), intervall = 7, relative = T
   daily.data[, `:=`(Bayern = glider.fun(Bayern), Belgien = glider.fun(Belgien), Schweden = glider.fun(Schweden), Tschechien = glider.fun(Tschechien))]
   return(daily.data)
 }
+
+#Balkendiagramm Fälle pro Tag Vorpräsentation 
+#Anpassen der Daten 
+cases.per.day.belgium <- select(cases.per.day, -Bayern, -Schweden, -Tschechien)
+cases.per.day.bayern <- select(cases.per.day, -Belgien, -Schweden, -Tschechien) 
+cases.per.day.schweden <- select(cases.per.day, -Bayern, -Belgien, -Tschechien) 
+cases.per.day.tschechien <- select(cases.per.day, -Bayern, -Schweden, -Belgien) 
+
+#Belgien
+balken.belgien <- ggplot(cases.per.day.belgium, aes(Datum, Belgien))+
+  geom_col(fill = "steelblue")+
+  ggtitle("Belgien")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  ylab("Fälle pro Tag")+
+  geom_hline(yintercept=1000, linetype="dashed", color = "red")+
+  geom_hline(yintercept = 5000, linetype = "dashed", color = "red")                    
+
+#Bayern
+balken.bayern  <- ggplot(cases.per.day.bayern, aes(Datum, Bayern))+
+  geom_col(fill = "steelblue")+
+  ggtitle("Bayern")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  ylab("Fälle pro Tag")+
+  geom_hline(yintercept=1000, linetype="dashed", color = "red")+
+  geom_hline(yintercept = 5000, linetype = "dashed", color = "red")                  
+
+#Tschechien
+balken.tschechien <- ggplot(cases.per.day.tschechien, aes(Datum, Tschechien))+
+  geom_col(fill = "steelblue")+
+  ggtitle("Tschechien")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  ylab("Fälle pro Tag")+
+  geom_hline(yintercept=1000, linetype="dashed", color = "red")+
+  geom_hline(yintercept = 5000, linetype = "dashed", color = "red")        
+
+#Schweden
+balken.schweden <- ggplot(cases.per.day.schweden, aes(Datum, Schweden))+
+  geom_col(fill = "steelblue")+
+  ggtitle("Schweden")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  ylab("Fälle pro Tag")+
+  geom_hline(yintercept=1000, linetype="dashed", color = "red")+
+  geom_hline(yintercept = 5000, linetype = "dashed", color = "red")
 

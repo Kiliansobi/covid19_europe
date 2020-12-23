@@ -32,3 +32,4 @@ View(incedence3)
 incedence7abs <- daily.incedence(Daten, end = "2020-11-14", intervall = 7, relative = TRUE)
 View(incedence7abs)
 
+#Balkendiagramm
