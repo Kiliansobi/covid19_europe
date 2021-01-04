@@ -1,4 +1,4 @@
-#22.12.20
+#17.11.2020
 update.data <- function() { 
   #BAVARIA
   
@@ -20,7 +20,7 @@ update.data <- function() {
   bavaria_rki           <- as.data.table(read.csv("data/bavaria/rki/RKI_COVID19.csv", encoding="UTF-8"))
   
   rki <- list(bavaria_rki)
-  
+  names(rki) <- c("bavaria_rki")
   bavaria <- list(lgl = lgl, rki = rki)
   
   
@@ -73,13 +73,13 @@ update.data <- function() {
 translate.DE <- function(data) {
   Daten <- data
   #Bayern
-  names(Daten$bavaria$lgl$bavaria_lgl_overview) <- c("Region", "Fälle", "Todesfälle")
+  names(Daten$bavaria$lgl$bavaria_lgl_overview) <- c("Region", "Faelle", "Todesfaelle")
   names(Daten$bavaria$lgl$bavaria_lgl_change) <- c("Spalte", "Gesamtfallzahl", "Differenz.zum.letzten.Aktualisierungs.Zeitpunkt", "Neu.berichtete.aktuelle.Fälle.seit.letzter.Aktualisierung", "Nachmeldungen", "Löschungen")
   names(Daten$bavaria$lgl$bavaria_lgl_regions) <- c("Regierungsbezirk", "Anzahl.der.Fälle", "Fälle.Änderung.zum.Vortag", "Fallzahl.pro.100.000.Einwohner", "Fälle.der.letzten.7.Tage", "X7.Tage.Inzidenz.pro.100.000.Einwohner", "Anzahl.der.Todesfälle", "Todesfälle.Änderung.zum.Vortag")
   names(Daten$bavaria$lgl$bavaria_lgl_county) <- c("Landkreis.Stadt", "Anzahl.der.Fälle", "Fälle.Änderung.zum.Vortag", "Fallzahl.pro.100.000.Einwohner", "Fälle.der.letzten.7.Tage", "X7.Tage.Inzidenz.pro.100.000.Einwohner", "Anzahl.der.Todesfälle", "Todesfälle.Änderung.zum.Vortag")
   names(Daten$bavaria$lgl$bavaria_lgl_days) <- c("Datum", "Vortag.bekannt", "Heute.bekannt", "bay.Fälle")
   names(Daten$bavaria$lgl$bavaria_lgl_weeks1) <- c("Kalenderwoche", "Altersgruppe", "Inzidenz", "Fälle")
-  names(Daten$bavaria$lgl$bavaria_lgl_age) <- c("Altersgruppe", "weiblich", "männlich", "unbekannt")
+  names(Daten$bavaria$lgl$bavaria_lgl_age) <- c("Altersgruppe", "weiblich", "maennlich", "unbekannt")
   names(Daten$bavaria$lgl$bavaria_lgl_weeks2) <- c("Kalenderwoche", "Altersgruppe", "Inzidenz", "Fälle")
   names(Daten$bavaria$lgl$bavaria_lgl_tests) <- c("Datum", "Tests", "positiv", "negativ", "Positivrate")
   
@@ -103,7 +103,7 @@ translate.DE <- function(data) {
   names(Daten$czech$czech_8) <- c("Datum","tsc.Testzahl","GesamtfälleAnzahl_Test","tsc.Anzahl_1stTest","GesamfälleAnzahl_1stTest")
   names(Daten$czech$czech_9) <- c("Datum","Alter","Geschlecht","Bundesland","Landkreis")
   names(Daten$czech$czech_10) <- c("Datum","Alter","Geschlecht","Bundesland","Landkreis")
-  names(Daten$czech$czech_11) <- c("Wochentag","Postleitzahl","PLZName","Inzidenz_7","Inzidenz_65_7","Häufigkeit","Häufigkeit_65","Häufigkeit_75","Aktuelle_Krankenhauspatient","Neuezahl_Krankenhauspatient_7","Testzahl_7")
+  names(Daten$czech$czech_11) <- c("Wochentag","Datum","Postleitzahl","PLZName","Inzidenz_7","Inzidenz_65_7","Inzidenz_75_7","Häufigkeit","Häufigkeit_65","Häufigkeit_75","Aktuelle_Krankenhauspatient","Neuezahl_Krankenhauspatient_7","Testzahl_7")
   names(Daten$czech$czech_12) <- c("Datum","GesamtTest","Insgesamtfälle","Aktuellefälle","AnzahlGenesen","Todesfälle","Aktuelle_KrankenhausPatient","AnzhalTest_Gestern","Anzahlfälle_Gestern","Anzahlfälle_Heute","GesternDatum","Insgesamtfallzahl_Datum_Gestern","Insgesamtfallzahl_Datum_Heute")
   
   #Schweden
@@ -125,8 +125,7 @@ translate.DE <- function(data) {
 
 transform.data <- function(Daten) {
   #Bavaria
-  Daten$bavaria$lgl$bavaria_lgl_days[, `:=`(Datum = as.Date(Datum, "%d.%m"), bay.Fälle = as.numeric(str_replace(as.character(bay.Fälle), "\\.", "")))]
-  
+  Daten$bavaria$lgl$bavaria_lgl_days[, `:=`(Datum = as.Date(Datum, "%d.%m.%Y"), bay.Fälle = as.numeric(str_replace(as.character(bay.Fälle), "\\.", "")))]
   
   #Belgium
   Daten$belgium$belgium_age.sex[, Datum := as.Date(Datum)]
@@ -183,5 +182,3 @@ daily.incedence <- function(Daten, end = Sys.Date(), intervall = 7, relative = T
   daily.data[, `:=`(Bayern = glider.fun(Bayern), Belgien = glider.fun(Belgien), Schweden = glider.fun(Schweden), Tschechien = glider.fun(Tschechien))]
   return(daily.data)
 }
-
-
