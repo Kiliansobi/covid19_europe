@@ -123,9 +123,9 @@ transform.data <- function(Daten) {
   Daten$czech$czech_3[, Datum := as.Date(Datum)]
   
   #Sweden
-  Daten$sweden$sweden_1[, Datum := as.Date(Datum)]
-  
-}
+  Daten$sweden$sweden_1[, Datum := as.Date(Datum, format="%m.%d.%Y")]
+  Daten$sweden$sweden_2[, Datum := as.Date(Datum, format="%m.%d.%Y")]
+  }
 
 daily.cases <- function(Daten, end = Sys.Date(), relative = TRUE, reverenz = 100000) {
   inhabitants <- c(Bayern = 13124737, Belgien = 11431406, Schweden = 10327589, Tschechien = 10637794)
@@ -136,7 +136,7 @@ daily.cases <- function(Daten, end = Sys.Date(), relative = TRUE, reverenz = 100
   names(Datum) <- "Datum"
   
   Bayern <- copy(Daten$bavaria$lgl$bavaria_lgl_days)[, c(1,4)]
-  Belgien <- copy(Daten$belgium$belgium_age.sex)[, c(1,6)][, sum(bel.Fälle), by = "Datum"][, bel.Fälle := V1][, V1 := NULL][-.N] #Letze zele hat kein Datum
+  Belgien <- copy(Daten$belgium$belgium_age.sex)[, c(1,6)][, sum(bel.Fälle), by = "Datum"][, bel.Fälle := V1][, V1 := NULL][-.N] #Letze zeile hat kein Datum
   Tschechien <- copy(Daten$czech$czech_3)[, c(1,2)]
   Schweden <- copy(Daten$sweden$sweden_1)[, c(1,2)]
   
