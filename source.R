@@ -203,7 +203,7 @@ names(Y) <- c("Datum", "Tschechien", "Schweden")
 deathcases <- full_join(W, Y, by = "Datum")
 deathcases[is.na(deathcases)] <- 0
 
-#Umwandeln in DF
+#Umwandeln
 deathcasesDF <- with(data=deathcases, expr=data.frame(deathcases$Datum, deathcases$Bayern, deathcases$Belgien, deathcases$Tschechien, deathcases$Schweden ))
 
 #Umsortieren by date
@@ -212,12 +212,21 @@ deathcasesDF <- deathcases[order(as.Date(deathcases$Datum, format="%Y-%m-%d")),]
 #Löschen der unwichtigen Daten (27.Jan-09.März) --> Keine Todesfälle
 deathcasesDF <- subset(deathcasesDF, Datum >= "2020-03-10")
 
+#Exportieren der liste
+write.csv(deathcasesDF, "Todesfälle_pro_Tag.csv")
+
+#Umwandeln in DT
+Todesfälle_fourland <- as.data.table(read.csv("Todesfälle_pro_Tag.csv"))
 
 
+##Daily death incidence per 100.000
 
+#7 Tage Inzidenz durch Gliderfun Funktion aus daily.incidence
+Todesfälle_7_incidence <- Todesfälle_fourland[, `:=`(Bayern = glider.fun(Bayern), Belgien = glider.fun(Belgien), Schweden = glider.fun(Schweden), Tschechien = glider.fun(Tschechien))]
 
+#7tage Inzidenz pro 100.000 über Factoren aus daily.incidence
 
-
+Todesfälle_vergleichbar <- Todesfälle_7_incidence[, `:=`(Bayern = Bayern * factor[1], Belgien = Belgien * factor[2], Schweden = Schweden * factor[3], Tschechien = Tschechien * factor[4])]
 
 
 
