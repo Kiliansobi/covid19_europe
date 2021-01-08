@@ -227,11 +227,49 @@ Todesfälle_7_incidence <- Todesfälle_fourland[, `:=`(Bayern = glider.fun(Bayer
 #7tage Inzidenz pro 100.000 über Factoren aus daily.incidence
 
 Todesfälle_vergleichbar <- Todesfälle_7_incidence[, `:=`(Bayern = Bayern * factor[1], Belgien = Belgien * factor[2], Schweden = Schweden * factor[3], Tschechien = Tschechien * factor[4])]
+###Test Kennwerte 
+## Test Kennwerte --> Positivrate
+
+#Bayern
+pr.bayern <- copy(bavaria_lgl_tests[,c(1,5)])
+
+#Belgien
+pr.b.t.belgien <- copy(Daten$belgium$belgium_tests)[, c(1,4)][, sum(Tests), by = "Datum"][, TEST_ALL := V1][, V1 := NULL][-.N]
+pr.b.p.belgien <- copy(Daten$belgium$belgium_tests)[, c(1,5)][, sum(positiv), by = "Datum"][, TEST_ALL := V1][, V1 := NULL][-.N] 
+
+pr.b.belgien <- full_join(pr.b.p.belgien, pr.b.t.belgien, by = "Datum")
+names(pr.b.belgien) <- c("Datum", "positive Tests", "Gesamtanzahl Tests")
+
+pr.belgien1 <- mutate(pr.b.belgien, Positiverate = pr.b.belgien$`positive Tests`/pr.b.belgien$`Gesamtanzahl Tests`)  
+pr.belgien1$Positiverate <- pr.belgien1$Positiverate*100 #Positivrate in Prozent  
+pr.belgien <- pr.belgien1[, c(1,4)]  
+
+#Tschechien
+pr.b.czech1 <- copy(czech_8[, c(1,2)])
+names(pr.b.czech1) <- c("Datum", "Gesamtanzahl Tests") 
+pr.b.czech1$Datum <- as.Date(pr.b.czech1$Datum)
+pr.b.czech <- full_join(pr.b.czech1, cases.per.day.tschechien, by = "Datum")
+pr.b.czech[order(as.Date(pr.b.czech$Datum, format="%Y-%m-%d")),]
+pr.b.czech[is.na(pr.b.czech)] <- 0  
+pr.czech1 <- mutate(pr.b.czech, Positvrate = pr.b.czech$Tschechien/pr.b.czech$`Gesamtanzahl Tests`) 
+pr.czech1 <- pr.czech1[- c(344:369)]
+pr.czech1$Positvrate <- pr.czech1$Positvrate*100
+pr.czech <- pr.czech1[, c(1,4)] 
+
+#Vorbereiten join Vorgang
+pr.czech$Datum <- as.Date(pr.czech$Datum, format="%Y-%m-%d")
+pr.bayern$Datum <- as.Date(pr.bayern$Datum, format="%d.%m.%Y")
+pr.belgien$Datum <- as.Date(pr.belgien$Datum, format="%Y-%m-%d")
 
 
+#Schweden --> keine Test Metadaten
 
+##Zusammenfügen der eizelnen pr Listen
 
+W <- full_join(pr.czech, pr.bayern, by = "Datum")
+pr.gesamt <- full_join(W, pr.belgien, by = "Datum")
 
+names(pr.gesamt) <- c("Datum", "Tschechien", "Bayern", "Belgien")
 
 
 
