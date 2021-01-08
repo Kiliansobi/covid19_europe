@@ -11,7 +11,7 @@ update.data <- function() {
   bavaria_lgl_age       <- as.data.table(read.csv("data/bavaria/lgl/tabelle_07_2021-01-04.csv", skip = 1, sep = ";", encoding="UTF-8"))
   bavaria_lgl_weeks2    <- as.data.table(read.csv("data/bavaria/lgl/tabelle_08_2021-01-04.csv", skip = 1, sep = ";", encoding="UTF-8"))
   bavaria_lgl_tests     <- as.data.table(read.csv("data/bavaria/lgl/tabelle_09_2021-01-04.csv", skip = 1, sep = ";", encoding="UTF-8"))
-  bavaria_death  <- subset(readRDS("deaths_temporal_prepared.rds"), state == "Bayern")
+  bavaria_death  <- subset(readRDS("data/bavaria/deaths_temporal_prepared.rds"), state == "Bayern")
   
   lgl <- list(bavaria_lgl_overview, bavaria_lgl_change, bavaria_lgl_regions, bavaria_lgl_countys, bavaria_lgl_days,
               bavaria_lgl_weeks1, bavaria_lgl_age, bavaria_lgl_weeks2, bavaria_lgl_tests, bavaria_death)
@@ -154,6 +154,7 @@ daily.cases <- function(Daten, end = Sys.Date(), relative = TRUE, reverenz = 100
   
   return(cases)
 }
+
 daily.incedence <- function(Daten, end = Sys.Date(), intervall = 7, relative = TRUE, reverenz = 100000) {
   daily.data <- daily.cases(Daten, end, relative, reverenz)
   glider.fun <- function(vector) {
@@ -182,12 +183,16 @@ daily.death.cases <- function(Daten, end = as.date(2021-01-04), relative = TRUE,
   DatumTot <- as.data.table(list(seq.Date(pandamic.start, pandemic.deadline, "day")))
   names(DatumTot) <- "Datum"
   
-  BayernTot <- copy(Daten$bavaria$lgl$bavaria_death)[, c(1,3)]
-  
-  BelgienTot <- copy(Daten$belgium$belgium_mortality)[, c(1,5)][, sum(Todesfälle), by = "Datum"][, Todesfälle := V1][, V1 := NULL][-.N] #Letze Zeile hat kein Datum
-  TschechienTot <- count(czech_9$datum)
+  BayernTot <- as.data.table(copy(Daten$bavaria$lgl$bavaria_death)[, c(1,3)])
+  BelgienTot <- as.data.table(copy(Daten$belgium$belgium_mortality)[, c(1,5)][, sum(Todesfälle), by = "Datum"][, Todesfälle := V1][, V1 := NULL][-.N]) #Letze Zeile hat kein Datum
+  TschechienTot <- as.data.table(count(czech_9$datum))
   names(TschechienTot) <- c("Datum", "Todesfälle")
-  SchwedenTot <- read.csv("data/sweden/Schweden02.csv")
+  SchwedenTot <- as.data.table(read.csv("data/sweden/Schweden02.csv"))
+  
+  BayernTot[, Datum := as.Date(Datum)]
+  BelgienTot[, Datum := as.Date(Datum)]
+  TschechienTot[, Datum := as.Date(Datum)]
+  SchwedenTot[, Datum := as.Date(Datum)]
   
   W <- TschechienTot[DatumTot, on = "Datum"]
   X <- SchwedenTot[W, on = "Datum"]
