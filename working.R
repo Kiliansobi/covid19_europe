@@ -8,6 +8,8 @@ transform.data(Daten)
 ##Daten anzeigen
 View(data)
 View(Daten)
+##Bilden von Todesfall/Tag Tabelle (Beispiele)
+deathcases.per.day <- daily.death.cases(Daten, end = "2020-12-30", relative = FALSE)
 
 ##Bilden von Fallzahl/Tag Tabelle (Beispiele)
 cases.per.day <- daily.cases(Daten, end = "2020-12-30", relative = FALSE)
@@ -17,38 +19,6 @@ bayern.day.cases + geom_line(colour="red")
 
 belgien.day.cases <- ggplot(data = cases.per.day, mapping = aes(x=Datum, y=Belgien))
 belgien.day.cases + geom_line(colour="blue")
-
-
-
-
-
-##Schweden
-
-
-
-##Tschechien
-Czech.all.cases <- (Daten$czech$czech_6)
-#create age groups
-countingCasesforAgeGroup <- function(dataset) {
-  agegroup <- c(0:8)
-  groupCountingResult <- rep(0, 9)
-  for (x in agegroup) {
-    groupCountingResult[x+1] <- nrow(subset(Czech.all.cases, Alter >= x*10 & Alter < (x+1)*10))
-  }
-  return(groupCountingResult)
-}
-
-Czech.age.group <- countingCasesforAgeGroup(Czech.all.cases)
-czech.aelter100 <- nrow(Czech.all.cases) - sum(Czech.age.group)
-#add the 90+ group to the groups vector
-Czech.age.group <- append(Czech.age.group, czech.aelter100)
-
-Czech.age <- data.frame(Altersgruppe = c("0-9","10-19","20-29","30-39","40-49","50-59","60-69","70-79","80-89","90+"),
-                        Faelle = Czech.age.group)
-
-Czech.age
-ggplot(Czech.age,aes(Altersgruppe, Faelle))+geom_bar(stat="identity",position = "dodge")+ggtitle("Czech")
-
 
 ##Bilden von Inzidenz Tabelle (Beispiele)
 incidence30 <- daily.incedence(Daten, end = "2020-11-14", intervall = 30, relative = FALSE)
@@ -197,7 +167,7 @@ alter.balken.schweden
 ##Todesbalken Fälle pro Tag Vorpräsentation
 
 #Anpassen der Daten
-Data01<-(Daten$bavaria$rki$bavaria_rki)  #Bayern  cases.in.bayern <- subset(cases.per.day.bayern, Datum >= "2020-10-01")
+Data01<-(Daten$bavaria$rki$bavaria_rki)  #Bayern  
 sub <- subset(Data01,Bundesland=="Bayern")
 Data2 <- (Daten$belgium$belgium_mortality)#Belgien
 Data3 <- (Daten$czech$czech_9)#Tschechien
@@ -215,7 +185,7 @@ todes.balken.bayern <- ggplot(data = sub,aes(as.Date(Meldedatum),AnzahlTodesfall
   scale_y_continuous(breaks=c(0,50,100,150,200,250,300,350,400,450,500),expand = c(0,0))+
   xlab("Datum")+ylab("Todesfaelle pro Tag")+
   ggtitle("Bayern")+
-  scale_x_date(date_labels = "%B (%Y)")+
+  scale_x_date(date_labels = "%B")+
   geom_hline(yintercept = 50, linetype="dashed", color = "black")+
   geom_hline(yintercept = 150, linetype = "dashed", color = "black")+
   theme(plot.title = element_text(hjust = 0.5))
@@ -356,6 +326,42 @@ cases.in.sweden <- subset(cases.per.day.schweden, Datum >= "2020-10-01") #Fälle
 cases.in.czech <- subset(cases.per.day.tschechien, Datum >= "2020-10-01") #Fälle Tschechien nach 1. Okt
 cases.in.belgien <- subset(cases.per.day.belgium, Datum >= "2020-10-01") #Fälle Belgien nach 1. Okt
 
+#Durchschnittliche Fallzahlen + Maximum ab 01. Oktober 2020 der jeweiligen Länder
+
+#MW
+mw.in.bay <- mean(cases.in.bayern$Bayern) #MW Bayern 
+mw.in.bel <- mean(cases.in.belgien$Belgien) #MW Belgien
+mw.in.swe <- mean(cases.in.sweden$Schweden) #MW Schweden
+mw.in.cze <- mean(cases.in.czech$Tschechien) #MW Tschechein
+
+#MAX
+max.in.bay <- max(cases.in.bayern$Bayern) #MW Bayern 
+max.in.bel <- max(cases.in.belgien$Belgien) #MW Belgien
+max.in.swe <- max(cases.in.sweden$Schweden) #MW Schweden
+max.in.cze <- max(cases.in.czech$Tschechien) #MW Tschechein
+
+#Visualisierung der Kennzahlen mittels matrix absolut
+mat_4land.in.abs <- matrix(
+  c(mw.in.bay, max.in.bay, mw.in.bel, max.in.bel, mw.in.swe, max.in.swe, mw.in.cze, max.in.cze),
+  nrow=2, ncol=4,
+  dimnames = list(c("Arithmetisches Mittel", "Maximum"), c("Bayern", "Belgien", "Schweden", "Tschechien"))
+)
+
+knitr::kable(mat_4land.in.abs)
+
+#visualisierung der Kennzahlen mittels Matrix relativ
+mat_4land.in.rel <- matrix(
+  c(mw.in.bay/131,25, max.in.bay/131,25, mw.in.bel/114,31, max.in.bel/114,31, mw.in.swe/103,28, max.in.swe/103,28, mw.in.cze/106,38, max.in.cze/106,38),
+  nrow=2, ncol=4,
+  dimnames = list(c("Arithmetisches Mittel", "Maximum"), c("Bayern", "Belgien", "Schweden", "Tschechien"))
+)
+
+knitr::kable(mat_4land.in.rel)
+#Exportieren der Matrizen
+
+write.csv(mat_4land.in.abs, "Matrix_4Länder.in.abs.csv")
+write.csv(mat_4land.in.rel, "Matrix_4Länder.in.rel.csv")
+
 #Balken Bayern Fälle pro Tag ab 1. Oktober 2020
 balken.bayern.in  <- ggplot(cases.in.bayern, aes(Datum, Bayern))+
   geom_col(fill = "steelblue")+
@@ -400,15 +406,40 @@ max.fr <- max(bay.fr) #MW fr
 max.sa <- max(bay.sa) #MW sa
 max.so <- max(bay.so) #MW so
 
+#Anteil an Gesamtfällen ab 1. Okt. 
+
+#Anpassen der Daten
+ges.bay <- sum(cases.in.bayern$Bayern) #Gesamtfälle in Bayern ab 1.Okt
+ges.mo <- sum(bay.mo) #Gesamtfälle in Bayern ab 1.Okt / Mo
+ges.di <- sum(bay.di) #Gesamtfälle in Bayern ab 1.Okt / Di
+ges.mi <- sum(bay.mi) #Gesamtfälle in Bayern ab 1.Okt / Mi
+ges.do <- sum(bay.do) #Gesamtfälle in Bayern ab 1.Okt / Do
+ges.fr <- sum(bay.fr) #Gesamtfälle in Bayern ab 1.Okt / Fr
+ges.sa <- sum(bay.sa) #Gesamtfälle in Bayern ab 1.Okt / Sa
+ges.so <- sum(bay.so) #Gesamtfälle in Bayern ab 1.Okt / So
+
+#Berechnen der Anteile
+ant.mo <- label_percent()(ges.mo/ges.bay) #Anteil Mo
+ant.di <- label_percent()(ges.di/ges.bay) #Anteil Di
+ant.mi <- label_percent()(ges.mi/ges.bay) #Anteil Mi
+ant.do <- label_percent()(ges.do/ges.bay) #Anteil Do
+ant.fr <- label_percent()(ges.fr/ges.bay) #Anteil Fr
+ant.sa <- label_percent()(ges.sa/ges.bay) #Anteil Sa
+ant.so <- label_percent()(ges.so/ges.bay) #Anteil So
+
 #Darstellung der Kennwerte durch Matrix
 
 mat_bay <- matrix(
-  c(mw.mo, max.mo, mw.di, max.di, mw.mi, max.mi, mw.do, max.do, mw.fr, max.fr, mw.sa, max.sa, mw.so, max.so),
-  nrow=2, ncol=7,
-  dimnames = list(c("Arithmetisches Mittel", "Maximum"), c("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"))
+  c(mw.mo, max.mo, ant.mo, mw.di, max.di, ant.di, mw.mi, max.mi, ant.mi, mw.do, max.do, ant.do, mw.fr, max.fr, ant.fr, mw.sa, max.sa, ant.sa, mw.so, max.so, ant.so),
+  nrow=3, ncol=7,
+  dimnames = list(c("Arithmetisches Mittel", "Maximum", "Anteil an Gesamtfällen"), c("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"))
 )
 
 knitr::kable(mat_bay)
+
+#Exportieren der Matrix
+
+write.csv(mat_bay, "Matrix_Bayern.csv")
 
 #Sonstige Ausreißer Vergleich
 sonstige.aus <- cases.per.day[c(310,354,357,365)]

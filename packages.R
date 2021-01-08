@@ -11,7 +11,8 @@ install.packages("data.table")
 install.packages("R6")
 install.packages("checkmate")
 install.packages("Rcpp")
-
+install.packages("scales")
+install.packages("plyr")
 
 # Load packages
 library("tidyverse")
@@ -24,3 +25,5 @@ library("data.table")
 library("R6")
 library("checkmate")
 library("Rcpp")
+library("scales")
+library("plyr")

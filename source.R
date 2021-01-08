@@ -11,11 +11,12 @@ update.data <- function() {
   bavaria_lgl_age       <- as.data.table(read.csv("data/bavaria/lgl/tabelle_07_2021-01-04.csv", skip = 1, sep = ";", encoding="UTF-8"))
   bavaria_lgl_weeks2    <- as.data.table(read.csv("data/bavaria/lgl/tabelle_08_2021-01-04.csv", skip = 1, sep = ";", encoding="UTF-8"))
   bavaria_lgl_tests     <- as.data.table(read.csv("data/bavaria/lgl/tabelle_09_2021-01-04.csv", skip = 1, sep = ";", encoding="UTF-8"))
+  bavaria_death  <- subset(readRDS("deaths_temporal_prepared.rds"), state == "Bayern")
   
   lgl <- list(bavaria_lgl_overview, bavaria_lgl_change, bavaria_lgl_regions, bavaria_lgl_countys, bavaria_lgl_days,
-              bavaria_lgl_weeks1, bavaria_lgl_age, bavaria_lgl_weeks2, bavaria_lgl_tests)
+              bavaria_lgl_weeks1, bavaria_lgl_age, bavaria_lgl_weeks2, bavaria_lgl_tests, bavaria_death)
   names(lgl) <- c("bavaria_lgl_overview", "bavaria_lgl_change", "bavaria_lgl_regions", "bavaria_lgl_countys", "bavaria_lgl_days",
-                  "bavaria_lgl_weeks1", "bavaria_lgl_age", "bavaria_lgl_weeks2", "bavaria_lgl_tests")
+                  "bavaria_lgl_weeks1", "bavaria_lgl_age", "bavaria_lgl_weeks2", "bavaria_lgl_tests", "bavaria_death")
   
   bavaria_rki           <- as.data.table(read.csv("data/bavaria/rki/RKI_COVID19.csv", encoding="UTF-8"))
   
@@ -119,7 +120,7 @@ transform.data <- function(Daten) {
   #Belgium
   Daten$belgium$belgium_age.sex[, Datum := as.Date(Datum)]
   
-  #Czeck
+  #Czech
   Daten$czech$czech_3[, Datum := as.Date(Datum)]
   
   #Sweden
@@ -130,8 +131,8 @@ transform.data <- function(Daten) {
 daily.cases <- function(Daten, end = Sys.Date(), relative = TRUE, reverenz = 100000) {
   inhabitants <- c(Bayern = 13124737, Belgien = 11431406, Schweden = 10327589, Tschechien = 10637794)
   factor <- reverenz / inhabitants
-  pandamic.start <- as.Date("2020-01-01")
-  pandemic.deadline <- as.Date(end)
+  pandamic.start <- as.Date("2020-03-01")
+  pandemic.deadline <- as.Date("2021-04-01")
   Datum <- as.data.table(list(seq.Date(pandamic.start, pandemic.deadline, "day")))
   names(Datum) <- "Datum"
   
@@ -170,4 +171,34 @@ daily.incedence <- function(Daten, end = Sys.Date(), intervall = 7, relative = T
   }
   daily.data[, `:=`(Bayern = glider.fun(Bayern), Belgien = glider.fun(Belgien), Schweden = glider.fun(Schweden), Tschechien = glider.fun(Tschechien))]
   return(daily.data)
+}
+
+daily.death.cases <- function(Daten, end = as.date(2021-01-04), relative = TRUE, reverenz = 100000) {
+  
+  inhabitants <- c(Bayern = 13124737, Belgien = 11431406, Schweden = 10327589, Tschechien = 10637794)
+  factor <- reverenz / inhabitants
+  pandamic.start <- as.Date("2020-03-01")
+  pandemic.deadline <- as.Date("2021-04-01")
+  DatumTot <- as.data.table(list(seq.Date(pandamic.start, pandemic.deadline, "day")))
+  names(DatumTot) <- "Datum"
+  
+  BayernTot <- copy(Daten$bavaria$lgl$bavaria_death)[, c(1,3)]
+  
+  BelgienTot <- copy(Daten$belgium$belgium_mortality)[, c(1,5)][, sum(Todesfälle), by = "Datum"][, Todesfälle := V1][, V1 := NULL][-.N] #Letze Zeile hat kein Datum
+  TschechienTot <- count(czech_9$datum)
+  names(TschechienTot) <- c("Datum", "Todesfälle")
+  SchwedenTot <- read.csv("data/sweden/Schweden02.csv")
+  
+  W <- TschechienTot[DatumTot, on = "Datum"]
+  X <- SchwedenTot[W, on = "Datum"]
+  Y <- BelgienTot[X, on = "Datum"]
+  Z <- BayernTot[Y, on = "Datum"]
+  deathcases <- Z
+  deathcases[is.na(deathcases)] <- 0
+  names(deathcases) <- c("Datum", "Bayern", "Belgien","Schweden", "Tschechien")
+  if (relative) {
+    cases[, `:=`(Bayern = Bayern * factor[1], Belgien = Belgien * factor[2], Schweden = Schweden * factor[3], Tschechien = Tschechien * factor[4])]
+  }
+  
+  return(cases)
 }
