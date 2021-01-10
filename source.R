@@ -289,8 +289,11 @@ names(pr.gesamt) <- c("Datum", "Tschechien", "Bayern", "Belgien")
 test.abs.bayern <- copy(bavaria_lgl_tests[,c(1,2)])
 names(test.abs.bayern) <- c("Datum", "Bayern")
 test.abs.bayern$Datum <- as.Date(test.abs.bayern$Datum, format="%d.%m.%Y")
-test.abs.bayern$Bayern <- as.numeric(test.abs.bayern$Bayern)
-test.abs.bayern[is.na(test.abs.bayern)] <- 0
+test.abs.bayern <- test.abs.bayern[2:16]
+test.abs.bayern$Bayern <- as.numeric(test.abs.bayern$Bayern) 
+
+#Remove Dots fromm Data column Bayer
+test.abs.bayern$Bayern <- test.abs.bayern$Bayern*1000
 
 #Belgien
 test.abs.belgien <-  copy(Daten$belgium$belgium_tests)[, c(1,4)][, sum(Tests), by = "Datum"][, TEST_ALL := V1][, V1 := NULL][-.N]
