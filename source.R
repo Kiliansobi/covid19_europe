@@ -173,6 +173,8 @@ daily.incedence <- function(Daten, end = Sys.Date(), intervall = 7, relative = T
   daily.data[, `:=`(Bayern = glider.fun(Bayern), Belgien = glider.fun(Belgien), Schweden = glider.fun(Schweden), Tschechien = glider.fun(Tschechien))]
   return(daily.data)
 }
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ##daily.deathcases
 
 #Vorbereitung daily.death.cases
@@ -227,6 +229,9 @@ Todesfälle_7_incidence <- Todesfälle_fourland[, `:=`(Bayern = glider.fun(Bayer
 #7tage Inzidenz pro 100.000 über Factoren aus daily.incidence
 
 Todesfälle_vergleichbar <- Todesfälle_7_incidence[, `:=`(Bayern = Bayern * factor[1], Belgien = Belgien * factor[2], Schweden = Schweden * factor[3], Tschechien = Tschechien * factor[4])]
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 ###Test Kennwerte 
 ## Test Kennwerte --> Positivrate
 
@@ -264,12 +269,52 @@ pr.belgien$Datum <- as.Date(pr.belgien$Datum, format="%Y-%m-%d")
 
 #Schweden --> keine Test Metadaten
 
-##Zusammenfügen der eizelnen pr Listen
+##Zusammenfügen der einzelnen pr Listen
 
 W <- full_join(pr.czech, pr.bayern, by = "Datum")
 pr.gesamt <- full_join(W, pr.belgien, by = "Datum")
 
 names(pr.gesamt) <- c("Datum", "Tschechien", "Bayern", "Belgien")
+
+##Testübersicht pro Land
+
+#Bayern
+test.abs.bayern <- copy(bavaria_lgl_tests[,c(1,2)])
+names(test.abs.bayern) <- c("Datum", "Bayern")
+test.abs.bayern$Datum <- as.Date(test.abs.bayern$Datum, format="%d.%m.%Y")
+test.abs.bayern$Bayern <- as.numeric(test.abs.bayern$Bayern)
+test.abs.bayern[is.na(test.abs.bayern)] <- 0
+
+#Belgien
+test.abs.belgien <-  copy(Daten$belgium$belgium_tests)[, c(1,4)][, sum(Tests), by = "Datum"][, TEST_ALL := V1][, V1 := NULL][-.N]
+names(test.abs.belgien) <- c("Datum", "Belgien")
+test.abs.belgien$Datum <- as.Date(test.abs.belgien$Datum, format = "%Y-%m-%d")
+
+#Tschechien
+test.abs.czech <- copy(czech_8[, c(1,2)])
+names(test.abs.czech) <- c("Datum", "Tschechien")
+test.abs.czech$Datum <- as.Date(test.abs.czech$Datum, format = "%Y-%m-%d")
+
+##Zusammenfügen der einzelnen Listen der abs Testanzahl
+
+Y <- full_join(test.abs.bayern, test.abs.belgien, by = "Datum")
+test.abs.gesamt1 <- full_join(Y, test.abs.czech, by = "Datum")
+test.abs.gesamt <- test.abs.gesamt1[order(as.Date(Datum, format="%Y-%m-%d")),]
+
+## Normierung der Werte auf 100.000 EW --> Vergleichbarkeit
+
+test.rel.gesamt <- test.abs.gesamt[, `:=`(Bayern = Bayern * factor[1], Belgien = Belgien * factor[2], Tschechien = Tschechien * factor[4])]
+
+
+
+
+
+
+
+
+
+
+
 
 
 
