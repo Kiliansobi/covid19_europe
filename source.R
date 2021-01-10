@@ -289,7 +289,7 @@ names(pr.gesamt) <- c("Datum", "Tschechien", "Bayern", "Belgien")
 test.abs.bayern <- copy(bavaria_lgl_tests[,c(1,2)])
 names(test.abs.bayern) <- c("Datum", "Bayern")
 test.abs.bayern$Datum <- as.Date(test.abs.bayern$Datum, format="%d.%m.%Y")
-test.abs.bayern <- test.abs.bayern[2:16]
+test.abs.bayern <- test.abs.bayern[2:126]
 test.abs.bayern$Bayern <- as.numeric(test.abs.bayern$Bayern) 
 
 #Remove Dots fromm Data column Bayer
