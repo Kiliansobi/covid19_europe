@@ -177,28 +177,35 @@ daily.incedence <- function(Daten, end = Sys.Date(), intervall = 7, relative = T
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ##daily.deathcases
 
-#Vorbereitung daily.death.cases
-names(BayernTot) <- c("Datum", "Todesfälle")
-names(BelgienTot) <- c("Datum", "Todesfälle")
-names(TschechienTot) <- c("Datum", "Todesfälle")
-names(SchwedenTot) <- c("Datum", "Todesfälle")
+
 
 ##daily.death.cases
 #Einwohner 
 inhabitants <- c(Bayern = 13124737, Belgien = 11431406, Schweden = 10327589, Tschechien = 10637794)
 
 #Datensätze anpassen  
-BayernTot <- as.data.table(copy(Daten$bavaria$lgl$bavaria_death)[, c(1,3)])
+BayernTot <- as.data.table(copy(bavaria_death)[, c(1,3)])
 BelgienTot <- as.data.table(copy(Daten$belgium$belgium_mortality)[, c(1,5)][, sum(Todesfälle), by = "Datum"][, Todesfälle := V1][, V1 := NULL][-.N]) #Letze Zeile hat kein Datum
 TschechienTot <- as.data.table(count(czech_9$datum))
-names(TschechienTot) <- c("Datum", "Todesfälle")
 SchwedenTot <- as.data.table(read.csv("data/sweden/Schweden02.csv"))
+
+#Vorbereitung daily.death.cases
+#Namensgebung
+names(BayernTot) <- c("Datum", "Todesfälle")
+names(BelgienTot) <- c("Datum", "Todesfälle")
+names(TschechienTot) <- c("Datum", "Todesfälle")
+names(SchwedenTot) <- c("Datum", "Todesfälle")
+
+#Vorbereitung join 
+BayernTot$Datum <- as.Date(BayernTot$Datum, format = "%Y-%m-%d")
+BelgienTot$Datum <- as.Date(BelgienTot$Datum, format = "%Y-%m-%d")
+TschechienTot$Datum <- as.Date(TschechienTot$Datum, format = "%Y-%m-%d")
+SchwedenTot$Datum <- as.Date(SchwedenTot$Datum, format = "%Y-%m-%d")
 
 #daily Deathcases
 W <- full_join(BayernTot, BelgienTot, by = "Datum")
 names(W) <- c("Datum", "Bayern", "Belgien")
-W$Datum <- as.character(W$Datum)
-  
+
 Y <- full_join(TschechienTot, SchwedenTot, by = "Datum")
 names(Y) <- c("Datum", "Tschechien", "Schweden")
  
@@ -219,7 +226,7 @@ write.csv(deathcasesDF, "Todesfälle_pro_Tag.csv")
 
 #Umwandeln in DT
 Todesfälle_fourland <- as.data.table(read.csv("Todesfälle_pro_Tag.csv"))
-
+  
 
 ##Daily death incidence per 100.000
 
