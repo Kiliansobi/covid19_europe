@@ -175,10 +175,6 @@ daily.incedence <- function(Daten, end = Sys.Date(), intervall = 7, relative = T
 }
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-##daily.deathcases
-
-
-
 ##daily.death.cases
 #Einwohner 
 inhabitants <- c(Bayern = 13124737, Belgien = 11431406, Schweden = 10327589, Tschechien = 10637794)
@@ -236,7 +232,7 @@ Todesfälle_7_incidence <- Todesfälle_fourland[, `:=`(Bayern = glider.fun(Bayer
 #7tage Inzidenz pro 100.000 über Factoren aus daily.incidence
 
 Todesfälle_vergleichbar <- Todesfälle_7_incidence[, `:=`(Bayern = Bayern * factor[1], Belgien = Belgien * factor[2], Schweden = Schweden * factor[3], Tschechien = Tschechien * factor[4])]
-
+Todesfälle_vergleichbar <- select(Todesfälle_vergleichbar, -X)
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ###Test Kennwerte 
@@ -283,10 +279,13 @@ pr.gesamt <- full_join(W, pr.belgien, by = "Datum")
 
 names(pr.gesamt) <- c("Datum", "Tschechien", "Bayern", "Belgien")
 
+#Positivrate über 7 Tage gemittelt
+pr.TsBe <- select(pr.gesamt, -Bayern)
+
 ##Testübersicht pro Land
 
 #Bayern
-test.abs.bayern <- copy(bavaria_lgl_tests[,c(1,2)])
+test.abs.bayern <- copy(bavaria_lgl_tests[,c(1,2)]
 names(test.abs.bayern) <- c("Datum", "Bayern")
 test.abs.bayern$Datum <- as.Date(test.abs.bayern$Datum, format="%d.%m.%Y")
 test.abs.bayern <- test.abs.bayern[2:126]
@@ -311,15 +310,19 @@ Y <- full_join(test.abs.bayern, test.abs.belgien, by = "Datum")
 test.abs.gesamt1 <- full_join(Y, test.abs.czech, by = "Datum")
 test.abs.gesamt <- test.abs.gesamt1[order(as.Date(Datum, format="%Y-%m-%d")),]
 
-## Normierung der Werte auf 100.000 EW --> Vergleichbarkeit
+## Normierung der Werte auf 10.000 EW --> Vergleichbarkeit
+inhabitants <- c(Bayern = 13124737, Belgien = 11431406, Schweden = 10327589, Tschechien = 10637794)
+reverenz1 = 10000
+factor1 = reverenz1/inhabitants
+test.rel.gesamt <- test.abs.gesamt[, `:=`(Bayern = Bayern * factor1[1], Belgien = Belgien * factor1[2], Tschechien = Tschechien * factor1[4])] 
+test.rel.gesamt$Tschechien <- round(test.rel.gesamt$Tschechien)
+test.rel.gesamt$Belgien <- round(test.rel.gesamt$Belgien)
+test.rel.gesamt$Bayern <- round(test.rel.gesamt$Bayern)
+test.rel.gesamt <- test.rel.gesamt[41:343] #Löschen von reduntanten Spalten
+view(test.rel.gesamt)
 
-test.rel.gesamt <- test.abs.gesamt[, `:=`(Bayern = Bayern * factor[1], Belgien = Belgien * factor[2], Tschechien = Tschechien * factor[4])]
-
-
-
-
-
-
+##7 Tage incidence Tests pro 10.000 EW
+test.rel.gesamt.incidence <- test.rel.gesamt[, `:=`(Bayern = glider.fun(Bayern), Belgien = glider.fun(Belgien), Tschechien = glider.fun(Tschechien))]
 
 
 
